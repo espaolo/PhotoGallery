@@ -9,7 +9,8 @@
 import UIKit
 import Photos
 
-class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate {
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate {
+    
 
     var myCollectionView: UICollectionView!
     private var reddits: [SubRedditData] = []
@@ -19,7 +20,12 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
 
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
         self.myCollectionView.reloadData()
+        
+
+
     }
     
     override func viewDidLoad() {
@@ -28,18 +34,16 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
 
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.title = "Photos"
-        let searchBar = UISearchBar()
-        searchBar.frame = CGRect(x: 0, y: 0, width: 200, height: 50)
-        searchBar.delegate = self
-        searchBar.showsCancelButton = true
-        searchBar.searchBarStyle = UISearchBar.Style.default
-        searchBar.placeholder = " Search Here....."
-        searchBar.sizeToFit()
-        
         let searchController = UISearchController(searchResultsController: nil) // Search Controller
+
         navigationItem.hidesSearchBarWhenScrolling = false
-        navigationItem.searchController = searchController
         searchController.hidesNavigationBarDuringPresentation = false
+        searchController.delegate = self;
+        searchController.searchResultsUpdater = self;
+        searchController.searchBar.delegate = self;
+        searchController.becomeFirstResponder()
+        self.navigationItem.searchController = searchController;
+
 
 
         
@@ -53,7 +57,6 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
         self.view.addSubview(myCollectionView)
         
         myCollectionView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
-        
         
         grabPhotos()
 
@@ -127,10 +130,16 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
                             downloadImage.loadImageUsingCache(withUrl: self!.urls[index])
                             self!.imageViewsArray.append(downloadImage)
                         }
-                    self?.myCollectionView.reloadData()
+                    //self?.myCollectionView.reloadData()
                  }
+             DispatchQueue.main.async {
+
+            self?.myCollectionView.reloadData()
+            }
+
         }
     }
+
     
 
 
@@ -140,47 +149,53 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
     }
 
 
-}
-
-
-class PhotoItemCell: UICollectionViewCell {
-
-    var img = UIImageView()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        img.contentMode = .scaleAspectFill
-        img.clipsToBounds=true
-        self.addSubview(img)
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = self.navigationItem.searchController?.searchBar.text else { return }
+        print("Change Search Test")
+        
     }
+    
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        img.frame = self.bounds
-    }
 
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-struct DeviceInfo {
-    struct Orientation {
-        // indicate current device is in the LandScape orientation
-        static var isLandscape: Bool {
-            get {
-                return UIDevice.current.orientation.isValidInterfaceOrientation
-                    ? UIDevice.current.orientation.isLandscape
-                    : UIApplication.shared.statusBarOrientation.isLandscape
-            }
+    class PhotoItemCell: UICollectionViewCell {
+        
+        var img = UIImageView()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            
+            img.contentMode = .scaleAspectFill
+            img.clipsToBounds=true
+            self.addSubview(img)
         }
-        // indicate current device is in the Portrait orientation
-        static var isPortrait: Bool {
-            get {
-                return UIDevice.current.orientation.isValidInterfaceOrientation
-                    ? UIDevice.current.orientation.isPortrait
-                    : UIApplication.shared.statusBarOrientation.isPortrait
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            img.frame = self.bounds
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+
+    struct DeviceInfo {
+        struct Orientation {
+            // indicate current device is in the LandScape orientation
+            static var isLandscape: Bool {
+                get {
+                    return UIDevice.current.orientation.isValidInterfaceOrientation
+                        ? UIDevice.current.orientation.isLandscape
+                        : UIApplication.shared.statusBarOrientation.isLandscape
+                }
+            }
+            // indicate current device is in the Portrait orientation
+            static var isPortrait: Bool {
+                get {
+                    return UIDevice.current.orientation.isValidInterfaceOrientation
+                        ? UIDevice.current.orientation.isPortrait
+                        : UIApplication.shared.statusBarOrientation.isPortrait
+                }
             }
         }
     }
