@@ -12,10 +12,15 @@ import Photos
 class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate {
 
     var myCollectionView: UICollectionView!
-    var imageArray=[UIImage]()
     private var reddits: [SubRedditData] = []
+    private var urls: [String] = []
+    private var imageViewsArray : [UIImageView] = []
 
 
+
+    override func viewWillAppear(_ animated: Bool) {
+        self.myCollectionView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,9 +42,6 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
         searchController.hidesNavigationBarDuringPresentation = false
 
 
-        //self.navigationItem.titleView = searchBar
-
-
         
         let layout = UICollectionViewFlowLayout()
         
@@ -52,7 +54,10 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
         
         myCollectionView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
         
+        
         grabPhotos()
+
+
     }
     
     
@@ -61,19 +66,25 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
     
     //MARK: CollectionView
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArray.count
+        return imageViewsArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell=collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! PhotoItemCell
-        cell.img.image=imageArray[indexPath.item]
+        let image = imageViewsArray[indexPath.item].image
+        if (image == nil) {
+            let placeholder = #imageLiteral(resourceName: "placeholder.png")
+            cell.img.image = placeholder
+            return cell
+        }
+        cell.img.image = image
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Selected Image" + String(indexPath.row + 1))
         let vc=ImageDetail()
-        vc.imgArray = self.imageArray
+        vc.imgArray = self.imageViewsArray
         vc.passedContentOffset = indexPath
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -103,48 +114,25 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
     
     //MARK: grab photos
     func grabPhotos(){
-        
+        imageViewsArray = []
         NetworkingService.shared.getReddits { [weak self] (response) in
                  
                  self?.reddits = response.data.children
                  DispatchQueue.main.async {
-                     print (self!.reddits)
+                     //print (self!.reddits)
+                        for (index, red) in self!.reddits.enumerated() {
+                            let imageURL = "\(red.data.url)"
+                            self!.urls.append(imageURL)
+                            let downloadImage = UIImageView()
+                            downloadImage.loadImageUsingCache(withUrl: self!.urls[index])
+                            self!.imageViewsArray.append(downloadImage)
+                        }
+                    self?.myCollectionView.reloadData()
                  }
-             }
-        
-        imageArray = []
-        
-        DispatchQueue.global(qos: .background).async {
-            print("This is run on the background queue")
-            let imgManager=PHImageManager.default()
-            
-            let requestOptions=PHImageRequestOptions()
-            requestOptions.isSynchronous=true
-            requestOptions.deliveryMode = .highQualityFormat
-            
-            let fetchOptions=PHFetchOptions()
-            fetchOptions.sortDescriptors=[NSSortDescriptor(key:"creationDate", ascending: false)]
-            
-            let fetchResult: PHFetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-            print(fetchResult)
-            print(fetchResult.count)
-            if fetchResult.count > 0 {
-                for i in 0..<fetchResult.count{
-                    imgManager.requestImage(for: fetchResult.object(at: i) as PHAsset, targetSize: CGSize(width:500, height: 500),contentMode: .aspectFill, options: requestOptions, resultHandler: { (image, error) in
-                        self.imageArray.append(image!)
-                    })
-                }
-            } else {
-                print("You got no photos.")
-            }
-            print("imageArray count: \(self.imageArray.count)")
-            
-            DispatchQueue.main.async {
-                print("This is run on the main queue, after the previous code in outer block")
-                self.myCollectionView.reloadData()
-            }
         }
     }
+    
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -156,22 +144,22 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
 
 
 class PhotoItemCell: UICollectionViewCell {
-    
+
     var img = UIImageView()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         img.contentMode = .scaleAspectFill
         img.clipsToBounds=true
         self.addSubview(img)
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         img.frame = self.bounds
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

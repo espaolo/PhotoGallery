@@ -30,7 +30,7 @@ class NetworkingService {
                 let decoder = JSONDecoder()
                 let model = try decoder.decode(Model.self, from: data!)
                 successBlock(model)
-                print("model is \(model)")
+                //print("model is \(model)")
             } catch {
                 print(error)
             }

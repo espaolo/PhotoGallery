@@ -11,7 +11,7 @@ import UIKit
 class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout  {
 
     var myCollectionView: UICollectionView!
-    var imgArray = [UIImage]()
+    var imgArray = [UIImageView]()
     var passedContentOffset = IndexPath()
     
     override func viewDidLoad() {
@@ -49,7 +49,7 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell=collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImagePreviewFullViewCell
-        cell.imgView.image=imgArray[indexPath.row]
+        cell.imgView.image=imgArray[indexPath.row].image
         return cell
     }
     
@@ -64,7 +64,7 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         myCollectionView.collectionViewLayout.invalidateLayout()
     }
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         let offset = myCollectionView.contentOffset
