@@ -13,7 +13,8 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
 
     var myCollectionView: UICollectionView!
     var imageArray=[UIImage]()
-    
+    private var reddits: [SubRedditData] = []
+
 
     
     override func viewDidLoad() {
@@ -102,6 +103,15 @@ class ViewController: UIViewController,UISearchBarDelegate, UICollectionViewDele
     
     //MARK: grab photos
     func grabPhotos(){
+        
+        NetworkingService.shared.getReddits { [weak self] (response) in
+                 
+                 self?.reddits = response.data.children
+                 DispatchQueue.main.async {
+                     print (self!.reddits)
+                 }
+             }
+        
         imageArray = []
         
         DispatchQueue.global(qos: .background).async {
