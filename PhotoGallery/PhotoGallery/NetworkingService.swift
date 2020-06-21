@@ -15,11 +15,15 @@ class NetworkingService {
     private init() {}
 
     let session = URLSession.shared
-    
-    //MARK: GET call to reddit
+    var searchKey = ""
+    //MARK: GET API for Reddit
 
     func getReddits(success successBlock: @escaping (Model) -> Void) {
-        guard let url = URL(string: "https://www.reddit.com/r/MemeEconomy/top.json") else { return }
+        if (searchKey == ""){
+            return
+        }
+        guard let url = URL(string: "https://www.reddit.com/r/\(searchKey)/top.json") else { return }
+        
         let request = URLRequest(url: url)
 
         session.dataTask(with: request) { [weak self] data, _, error in
@@ -32,6 +36,7 @@ class NetworkingService {
                 successBlock(model)
             } catch {
                 print(error)
+                return
             }
             }.resume()
     }

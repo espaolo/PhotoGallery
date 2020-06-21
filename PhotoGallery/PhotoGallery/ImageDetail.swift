@@ -16,11 +16,12 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         
         self.view.backgroundColor=UIColor.black
-        
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.view.backgroundColor = UIColor.clear
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         layout.minimumInteritemSpacing=0
@@ -55,13 +56,9 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        
         guard let flowLayout = myCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
-        
         flowLayout.itemSize = myCollectionView.frame.size
-        
         flowLayout.invalidateLayout()
-        
         myCollectionView.collectionViewLayout.invalidateLayout()
     }
 
@@ -69,15 +66,12 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
         super.viewWillTransition(to: size, with: coordinator)
         let offset = myCollectionView.contentOffset
         let width  = myCollectionView.bounds.size.width
-        
         let index = round(offset.x / width)
         let newOffset = CGPoint(x: index * size.width, y: offset.y)
         
         myCollectionView.setContentOffset(newOffset, animated: false)
-        
         coordinator.animate(alongsideTransition: { (context) in
             self.myCollectionView.reloadData()
-            
             self.myCollectionView.setContentOffset(newOffset, animated: false)
         }, completion: nil)
     }
@@ -110,7 +104,7 @@ class ImagePreviewFullViewCell: UICollectionViewCell, UIScrollViewDelegate {
         self.addSubview(scrollImg)
         
         imgView = UIImageView()
-        imgView.image = UIImage(named: "user3")
+        imgView.image = UIImage(named: "image")
         scrollImg.addSubview(imgView!)
         imgView.contentMode = .scaleAspectFit
     }

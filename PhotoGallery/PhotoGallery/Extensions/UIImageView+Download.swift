@@ -18,7 +18,7 @@ extension UIImageView {
         let url = URL(string: urlString)
         if url == nil {return}
         self.image = nil
-        imageCache.countLimit = 100
+        imageCache.countLimit = 50
 
         // check cached image
         if let cachedImage = imageCache.object(forKey: urlString as NSString)  {
@@ -32,11 +32,14 @@ extension UIImageView {
                 print(error!)
                 return
             }
-
+            
             DispatchQueue.main.async {
                 if let image = UIImage(data: data!) {
                     imageCache.setObject(image, forKey: urlString as NSString)
                     self.image = image
+                    NotificationCenter.default.post(name: Notification.Name("RELOAD"), object: nil)
+
+                    
                 }
             }
 
