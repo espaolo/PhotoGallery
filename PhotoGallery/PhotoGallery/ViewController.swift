@@ -15,9 +15,9 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     var myCollectionView: UICollectionView!
     private var reddits: [SubRedditData] = []
     private var urls: [String] = []
-    private var timer = Timer()
-    private var counter = Int()
     private var imageViewsArray : [UIImageView] = []
+    private var imageTitle : [String] = []
+    private var timer = Timer()
     let searchController = UISearchController(searchResultsController: nil)
 
 
@@ -100,6 +100,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         print("Selected Image" + String(indexPath.row + 1))
         let vc=ImageDetail()
         vc.imgArray = self.imageViewsArray
+        vc.infoArray = self.imageTitle
         vc.passedContentOffset = indexPath
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -114,7 +115,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         }
     }
     @objc func methodOfReceivedNotification(notification: Notification) {
+        self.searchController.searchBar.isLoading = true
         self.myCollectionView.reloadData()
+        //self.searchController.searchBar.isLoading = false
+        self.checkEmptyImages()
+
     }
 
     override func viewWillLayoutSubviews() {
@@ -134,22 +139,26 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     func grabPhotos(){
         self.view.addSubview(myCollectionView)
         myCollectionView.isHidden = false
-        imageViewsArray = []
         urls = []
+        imageViewsArray = []
+        imageTitle = []
         NetworkingService.shared.getReddits { [weak self] (response) in
                  self?.reddits = response.data.children
                  DispatchQueue.main.async {
                      //print (self!.reddits)
                         for (index, red) in self!.reddits.enumerated() {
                             let imageURL = "\(red.data.url)"
+                            let imageTitle = "\(red.data.title)"
                             self!.urls.append(imageURL)
                             if (imageURL.hasSuffix("jpg") || imageURL.hasSuffix("png")) {
                             let downloadImage = UIImageView()
                             downloadImage.loadImageUsingCache(withUrl: self!.urls[index])
                             self!.imageViewsArray.append(downloadImage)
-                            self?.counter = (self!.imageViewsArray.count)
+                            self!.imageTitle.append(imageTitle)
                             }
                         }
+                    self?.searchController.searchBar.isLoading = false
+                    self?.checkEmptyImages()
                  }
             //MARK: Fixed delay time to fetch cell images (DIRTY)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
@@ -176,12 +185,13 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         guard let text = self.navigationItem.searchController?.searchBar.text else { return }
         print("User is writing in searchBar")
         timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(ViewController.reload), userInfo: text, repeats: false)
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(ViewController.reload), userInfo: text, repeats: false)
 
     }
     
     @objc func reload() {
         guard let searchText = self.navigationItem.searchController?.searchBar.text else { return }
+        if (searchText != NetworkingService.shared.searchKey && searchText != ""){
         NetworkingService.shared.searchKey = searchText
         grabPhotos()
         self.myCollectionView.reloadData()
@@ -192,6 +202,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             print("User Stopped Writing")
         }
         timer.invalidate()
+        }
     }
     
     //MARK: Collection View Cell

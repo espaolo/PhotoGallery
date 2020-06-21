@@ -12,6 +12,8 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
 
     var myCollectionView: UICollectionView!
     var imgArray = [UIImageView]()
+    var infoArray = [String]()
+
     var passedContentOffset = IndexPath()
     
     override func viewDidLoad() {
@@ -51,6 +53,7 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell=collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! ImagePreviewFullViewCell
         cell.imgView.image=imgArray[indexPath.row].image
+        cell.titleView.text=infoArray[indexPath.row]
         return cell
     }
     
@@ -83,6 +86,7 @@ class ImagePreviewFullViewCell: UICollectionViewCell, UIScrollViewDelegate {
     
     var scrollImg: UIScrollView!
     var imgView: UIImageView!
+    var titleView: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -104,9 +108,18 @@ class ImagePreviewFullViewCell: UICollectionViewCell, UIScrollViewDelegate {
         self.addSubview(scrollImg)
         
         imgView = UIImageView()
-        imgView.image = UIImage(named: "image")
+        imgView.image = UIImage(named: "An image")
         scrollImg.addSubview(imgView!)
         imgView.contentMode = .scaleAspectFit
+        
+        titleView = UILabel(frame: CGRect(x: 0, y: self.frame.height - 50, width: self.frame.width, height: 50))
+        titleView.text = "Some title text"
+        titleView.numberOfLines = 2
+        titleView.font = UIFont(name: "AvenirNext-Bold", size: 18)
+        titleView.textColor = UIColor.white
+        titleView.textAlignment = .left
+        imgView.addSubview(titleView)
+
     }
     
     @objc func handleDoubleTapScrollView(recognizer: UITapGestureRecognizer) {
