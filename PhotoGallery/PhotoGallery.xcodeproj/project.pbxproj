@@ -20,6 +20,7 @@
 		8441D564249EF7C0008B96EE /* UISearchBar+Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441D561249EF7C0008B96EE /* UISearchBar+Activity.swift */; };
 		8441D565249EF7C0008B96EE /* UIImageView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441D562249EF7C0008B96EE /* UIImageView+Download.swift */; };
 		8441D566249EF7C0008B96EE /* UIImage+Pixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441D563249EF7C0008B96EE /* UIImage+Pixel.swift */; };
+		8441D568249FB0FC008B96EE /* UINavigationController+Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441D567249FB0FC008B96EE /* UINavigationController+Rotation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		8441D561249EF7C0008B96EE /* UISearchBar+Activity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UISearchBar+Activity.swift"; sourceTree = "<group>"; };
 		8441D562249EF7C0008B96EE /* UIImageView+Download.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageView+Download.swift"; sourceTree = "<group>"; };
 		8441D563249EF7C0008B96EE /* UIImage+Pixel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Pixel.swift"; sourceTree = "<group>"; };
+		8441D567249FB0FC008B96EE /* UINavigationController+Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Rotation.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				8441D561249EF7C0008B96EE /* UISearchBar+Activity.swift */,
 				8441D562249EF7C0008B96EE /* UIImageView+Download.swift */,
 				8441D563249EF7C0008B96EE /* UIImage+Pixel.swift */,
+				8441D567249FB0FC008B96EE /* UINavigationController+Rotation.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				8441D52C249A8A99008B96EE /* ViewController.swift in Sources */,
 				8441D528249A8A99008B96EE /* AppDelegate.swift in Sources */,
 				8441D552249E5E77008B96EE /* NetworkingService.swift in Sources */,
+				8441D568249FB0FC008B96EE /* UINavigationController+Rotation.swift in Sources */,
 				8441D566249EF7C0008B96EE /* UIImage+Pixel.swift in Sources */,
 				8441D52A249A8A99008B96EE /* SceneDelegate.swift in Sources */,
 				8441D565249EF7C0008B96EE /* UIImageView+Download.swift in Sources */,

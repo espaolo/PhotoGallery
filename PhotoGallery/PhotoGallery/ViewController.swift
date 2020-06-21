@@ -11,7 +11,6 @@ import UIKit
 
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate {
     
-
     var myCollectionView: UICollectionView!
     private var reddits: [SubRedditData] = []
     private var urls: [String] = []
@@ -24,17 +23,25 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        let value = UIInterfaceOrientation.portrait.rawValue
+        UIDevice.current.setValue(value, forKey: "orientation")
         DispatchQueue.main.async {
         self.myCollectionView.reloadData()
         }
     }
     
+    
+    override open var shouldAutorotate: Bool {
+        return false
+    }
+
+    
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         //Notification handler for new datasource
-        NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("RELOAD"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReloadNotification(notification:)), name: Notification.Name("RELOAD"), object: nil)
 
         //self.navigationController?.navigationBar.prefersLargeTitles = true
         self.title = "Photos"
@@ -44,7 +51,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         let noPhotos = UILabel()
         noPhotos.frame = CGRect(x: 100, y: 100, width: 300, height: 80)
         noPhotos.textAlignment = .center
-        noPhotos.text = "No photos"
+        noPhotos.text = "No pics"
         noPhotos.textColor = .black
         noPhotos.center = self.view.center
         noPhotos.font = noPhotos.font.withSize(50)
@@ -114,12 +121,14 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             return CGSize(width: width/6 - 1, height: width/6 - 1)
         }
     }
-    @objc func methodOfReceivedNotification(notification: Notification) {
+    
+    
+    @objc func methodOfReloadNotification(notification: Notification) {
         self.searchController.searchBar.isLoading = true
         self.myCollectionView.reloadData()
-        //self.searchController.searchBar.isLoading = false
-        self.checkEmptyImages()
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        self.searchController.searchBar.isLoading = false
+        }
     }
 
     override func viewWillLayoutSubviews() {
@@ -157,14 +166,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                             self!.imageTitle.append(imageTitle)
                             }
                         }
-                    self?.searchController.searchBar.isLoading = false
-                    self?.checkEmptyImages()
                  }
-            //MARK: Fixed delay time to fetch cell images (DIRTY)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            self?.searchController.searchBar.isLoading = false
-            self?.checkEmptyImages()
-            }
+        }
+        // Search for emtpy collection to show NoPhotos label
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        self.searchController.searchBar.isLoading = false
+        self.checkEmptyImages()
         }
     }
 
@@ -179,6 +186,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    deinit {
+        // Remove Observer subscription
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("RELOAD"), object: nil)
+    }
+
 
     //MARK: SearchBar delegates
     func updateSearchResults(for searchController: UISearchController) {
@@ -189,6 +202,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
 
     }
     
+    // Reload function for Search Bar new text
     @objc func reload() {
         guard let searchText = self.navigationItem.searchController?.searchBar.text else { return }
         if (searchText != NetworkingService.shared.searchKey && searchText != ""){

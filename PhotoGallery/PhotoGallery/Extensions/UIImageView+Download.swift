@@ -37,9 +37,8 @@ extension UIImageView {
                 if let image = UIImage(data: data!) {
                     imageCache.setObject(image, forKey: urlString as NSString)
                     self.image = image
+                    // Send reload message to subscribers
                     NotificationCenter.default.post(name: Notification.Name("RELOAD"), object: nil)
-
-                    
                 }
             }
 

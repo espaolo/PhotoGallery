@@ -39,6 +39,11 @@ class ImageDetail: UIViewController, UICollectionViewDelegate, UICollectionViewD
         myCollectionView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
     }
     
+    override open var shouldAutorotate: Bool {
+        return false
+    }
+
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         myCollectionView.scrollToItem(at: passedContentOffset, at: .left, animated: true)
@@ -154,6 +159,7 @@ class ImagePreviewFullViewCell: UICollectionViewCell, UIScrollViewDelegate {
         super.prepareForReuse()
         scrollImg.setZoomScale(1, animated: true)
     }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
